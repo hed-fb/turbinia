@@ -2,3 +2,4 @@ filelock
 six
 kombu
 celery
+pyhindsight
