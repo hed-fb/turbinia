@@ -789,7 +789,8 @@ class TurbiniaCeleryWorker(TurbiniaClient):
     """Start Turbinia Celery Worker."""
     log.info('Running Turbinia Celery Worker.')
     self.worker.task(task_manager.task_runner, name='task_runner')
-    argv = ['celery', 'worker', '--loglevel=info', '--pool=solo']
+    loglev = "debug" if config.DEBUG_TASKS else "info"
+    argv = ['celery', 'worker', '--loglevel={0:s}'.format(loglev)]
     self.worker.start(argv)
 
 
