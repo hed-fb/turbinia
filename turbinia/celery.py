@@ -55,11 +55,7 @@ class TurbiniaCelery(object):
     self.app.conf.update(
         task_default_queue=config.INSTANCE_ID,
         accept_content=['json'],
-        # TODO(ericzinnikas): Without task_acks_late Celery workers will start
-        # on one task and prefetch another (i.e. can result in 1 worker getting
-        # 2 plaso jobs while another worker is free). But enabling this causes
-        # problems with certain Celery brokers (duplicated work).
-        task_acks_late=False,
+        task_acks_late=True,
         task_track_started=True,
         worker_concurrency=1,
         worker_prefetch_multiplier=1,
@@ -75,17 +71,18 @@ class TurbiniaKombu(TurbiniaMessageBase):
 
   def __init__(self, routing_key):
     """Kombu config."""
+    self.conn = None
     self.queue = None
     self.routing_key = routing_key
 
   def setup(self):
     """Set up Kombu SimpleBuffer"""
     config.LoadConfig()
-    conn = kombu.Connection(config.KOMBU_BROKER)
+    self.conn = kombu.Connection(config.KOMBU_BROKER)
     if config.KOMBU_DURABLE:
-      self.queue = conn.SimpleQueue(name=self.routing_key)
+      self.queue = self.conn.SimpleQueue(name=self.routing_key)
     else:
-      self.queue = conn.SimpleBuffer(name=self.routing_key)
+      self.queue = self.conn.SimpleBuffer(name=self.routing_key)
 
   def check_messages(self):
     """See if we have any messages in the queue.
@@ -104,12 +101,13 @@ class TurbiniaKombu(TurbiniaMessageBase):
             message.ack()
       except queue.Empty:
         break
-      except ChannelError:
+      except self.conn.recoverable_channel_errors:
         break
-      except OperationalError as e:
+      except self.conn.recoverable_connection_errors as e:
         log.warning(
             'Caught recoverable message transport connection error when ' +
             'fetching from queue: {0!s}'.format(e))
+        self.setup()
         break
 
     log.debug('Received {0:d} messages'.format(len(requests)))
