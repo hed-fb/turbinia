@@ -58,7 +58,7 @@ class VolatilityTask(TurbiniaTask):
 
     # TODO: Add in config options for Turbinia
     cmd = (
-        'vol.py -f {0:s} --profile={1:s} {2:s} --output=text '
+        'vol.py -f {0:s} --profile={1:s} {2:s} --output=json '
         '--output-file={3:s}').format(
             evidence.local_path, evidence.profile, self.module,
             output_file_path).split()
