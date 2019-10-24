@@ -53,7 +53,7 @@ class VolatilityTask(TurbiniaTask):
 
     # Create a path that we can write the new file to.
     output_file_path = os.path.join(
-        self.output_dir, '{0:s}.txt'.format(self.id))
+        self.output_dir, '{0:s}'.format(self.module+"__"+self.profile))
     output_evidence.local_path = output_file_path
 
     # TODO: Add in config options for Turbinia
