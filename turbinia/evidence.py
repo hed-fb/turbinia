@@ -495,8 +495,11 @@ class ExportedFileArtifact(Evidence):
 
 class VolatilityReport(TextFile):
   """Volatility output file data."""
-  pass
-
+  def __init__(self, module, profile, hostname):
+    self.module = module
+    self.profile = profile
+    self.hostname = hostname
+    
 
 class RawMemory(Evidence):
   """Evidence object for Memory based evidence.
