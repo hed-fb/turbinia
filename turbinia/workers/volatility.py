@@ -55,6 +55,9 @@ class VolatilityTask(TurbiniaTask):
     output_file_path = os.path.join(
         self.output_dir, '{0:s}'.format(self.module+"__"+self.profile))
     output_evidence.local_path = output_file_path
+    output_evidence.module = self.module
+    output_evidence.profile = evidence.profile
+    output_evidence.hostname = evidence.hostname
 
     # TODO: Add in config options for Turbinia
     cmd = (
